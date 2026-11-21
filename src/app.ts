@@ -8,6 +8,7 @@ import paymentsRoutes from './routes/payments.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import { errorHandler } from './middlewares/error.js';
 import { handleStripeWebhook } from './controllers/payments.controller.js';
+import { getSystemHealth } from './utils/health.js';
 
 export function createApp(): Application {
   const app = express();
@@ -35,11 +36,7 @@ export function createApp(): Application {
 
   // Health check endpoint
   app.get('/api/health', (_req: Request, res: Response) => {
-    res.status(200).json({
-      status: 'healthy',
-      app: 'FixMate API',
-      timestamp: new Date().toISOString(),
-    });
+    res.status(200).json(getSystemHealth());
   });
 
   // Mount Application Routes
