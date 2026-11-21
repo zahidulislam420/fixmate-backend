@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { ENV } from './config/env.js';
 import authRoutes, { userProfileRouter } from './routes/auth.routes.js';
@@ -15,32 +15,44 @@ import { getSystemHealth } from './utils/health.js';
 export function createApp(): Application {
   const app = express();
 
-  // CORS configuration allowing frontend origin and deployed Vercel domains
-  const allowedOrigins = [
-    ENV.CLIENT_URL,
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-  ].filter(Boolean);
+  // Universal CORS handler: Allows ANY origin, port, or domain with credentials support
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'
+    );
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization, X-Requested-With, Accept, Origin'
+    );
 
+    // Fast response to browser preflight OPTIONS checks
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
+
+  // Standard cors middleware with origin: true (echoes request origin)
   app.use(
     cors({
-      origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. mobile apps, curl, webhooks)
-        if (!origin) return callback(null, true);
-        if (
-          allowedOrigins.includes(origin) ||
-          origin.includes('vercel.app') ||
-          origin.includes('localhost')
-        ) {
-          return callback(null, true);
-        }
-        return callback(null, true); // Permissive for production web clients
-      },
+      origin: true,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
     })
   );
+
+  // Preflight handling for all routes
+  app.options('*', cors({ origin: true, credentials: true }));
 
   // Stripe Webhook MUST receive the raw body
   app.post(
