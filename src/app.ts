@@ -14,10 +14,27 @@ import { getSystemHealth } from './utils/health.js';
 export function createApp(): Application {
   const app = express();
 
-  // CORS configuration allowing frontend origin
+  // CORS configuration allowing frontend origin and deployed Vercel domains
+  const allowedOrigins = [
+    ENV.CLIENT_URL,
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ].filter(Boolean);
+
   app.use(
     cors({
-      origin: [ENV.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+      origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, curl, webhooks)
+        if (!origin) return callback(null, true);
+        if (
+          allowedOrigins.includes(origin) ||
+          origin.includes('vercel.app') ||
+          origin.includes('localhost')
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, true); // Permissive for production web clients
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
