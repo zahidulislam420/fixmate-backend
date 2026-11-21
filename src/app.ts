@@ -9,6 +9,7 @@ import adminRoutes from './routes/admin.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import { errorHandler } from './middlewares/error.js';
 import { handleStripeWebhook } from './controllers/payments.controller.js';
+import { handleHttpSeed } from './controllers/seed.controller.js';
 import { getSystemHealth } from './utils/health.js';
 
 export function createApp(): Application {
@@ -56,6 +57,9 @@ export function createApp(): Application {
   app.get('/api/health', (_req: Request, res: Response) => {
     res.status(200).json(getSystemHealth());
   });
+
+  // Cloud seed endpoint for free-tier deployments without shell access
+  app.get('/api/seed', handleHttpSeed);
 
   // Mount Application Routes
   app.use('/api/auth', authRoutes);
