@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const ENV = {
-  PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
+  PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 5055,
   NODE_ENV: process.env.NODE_ENV || 'development',
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fixmate',
   JWT_SECRET: process.env.JWT_SECRET || 'fixmate_jwt_super_secret_key_2025_secure_token',
