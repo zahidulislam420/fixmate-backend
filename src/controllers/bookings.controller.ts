@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 import { getBookingsCollection, getServicesCollection } from '../config/db.js';
 import { BookingDoc, BookingStatus, StatusHistoryItem } from '../types/index.js';
+import { getParamId } from '../utils/params.js';
 
 const createBookingSchema = z.object({
   serviceId: z.string().min(1, 'Service ID is required'),
@@ -168,8 +169,8 @@ export async function cancelBooking(req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid booking ID' });
       return;
     }
@@ -267,8 +268,8 @@ export async function updateBookingStatus(req: Request, res: Response): Promise<
       return;
     }
 
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid booking ID' });
       return;
     }
@@ -373,10 +374,10 @@ export async function addBookingReview(req: Request, res: Response): Promise<voi
       return;
     }
 
-    const { id } = req.params;
+    const id = getParamId(req, 'id');
     const { rating, review } = req.body;
 
-    if (!ObjectId.isValid(id)) {
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid booking ID' });
       return;
     }

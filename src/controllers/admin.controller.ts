@@ -8,6 +8,7 @@ import {
   getPaymentsCollection,
 } from '../config/db.js';
 import { UserRole } from '../types/index.js';
+import { getParamId } from '../utils/params.js';
 
 // GET /api/admin/stats
 export async function getAdminStats(_req: Request, res: Response): Promise<void> {
@@ -96,8 +97,8 @@ export async function updateUserRole(req: Request, res: Response): Promise<void>
       return;
     }
 
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid user ID' });
       return;
     }
@@ -177,8 +178,8 @@ const approvalSchema = z.object({
 // PATCH /api/admin/services/:id/approval
 export async function updateServiceApproval(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid service ID' });
       return;
     }

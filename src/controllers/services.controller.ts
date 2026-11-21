@@ -3,6 +3,7 @@ import { ObjectId, Filter } from 'mongodb';
 import { z } from 'zod';
 import { getServicesCollection, getUsersCollection } from '../config/db.js';
 import { ServiceDoc, ServiceCategory, ServiceMode } from '../types/index.js';
+import { getParamId } from '../utils/params.js';
 
 const validCategories: ServiceCategory[] = [
   'Smartphone',
@@ -104,8 +105,8 @@ export async function getPublicServices(req: Request, res: Response): Promise<vo
 // Service Details Page (/services/:id)
 export async function getServiceById(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(404).json({ success: false, message: 'Invalid service ID' });
       return;
     }
@@ -260,8 +261,8 @@ export async function updateService(req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid service ID' });
       return;
     }
@@ -326,8 +327,8 @@ export async function deleteService(req: Request, res: Response): Promise<void> 
       return;
     }
 
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid service ID' });
       return;
     }
@@ -365,8 +366,8 @@ export async function toggleServiceAvailability(req: Request, res: Response): Pr
       return;
     }
 
-    const { id } = req.params;
-    if (!ObjectId.isValid(id)) {
+    const id = getParamId(req, 'id');
+    if (!id || !ObjectId.isValid(id)) {
       res.status(400).json({ success: false, message: 'Invalid service ID' });
       return;
     }
