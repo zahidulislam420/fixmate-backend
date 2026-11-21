@@ -6,6 +6,7 @@ import servicesRoutes from './routes/services.routes.js';
 import bookingsRoutes from './routes/bookings.routes.js';
 import paymentsRoutes from './routes/payments.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import uploadRoutes from './routes/upload.routes.js';
 import { errorHandler } from './middlewares/error.js';
 import { handleStripeWebhook } from './controllers/payments.controller.js';
 import { getSystemHealth } from './utils/health.js';
@@ -46,6 +47,7 @@ export function createApp(): Application {
   app.use('/api/bookings', bookingsRoutes);
   app.use('/api/payments', paymentsRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/upload', uploadRoutes);
 
   // 404 handler for unknown API routes
   app.use((_req: Request, res: Response) => {
